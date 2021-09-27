@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  loki:
+    container_name: loki
+    image: grafana/loki:2.3.0
+    ports:
+    - "3100:3100"
+    volumes:
+    - "./loki-data:/loki"
+    - "./loki.yaml:/etc/loki/local-config.yaml:ro"
+  vector:
+    container_name: vector
+    # image: timberio/vector:0.15.2-alpine
+    # image: timberio/vector:0.16.0-alpine
+    # image: timberio/vector:0.16.1-alpine
+    image: timberio/vector:nightly-alpine
+    environment:
+      VECTOR_WATCH_CONFIG: /etc/vector/vector.toml
+      RUST_BACKTRACE: full
+      # LOG: debug
+    ports:
+    - "8686:8686"
+    - "8787:8787"
+    volumes:
+    - "./vector.toml:/etc/vector/vector.toml:ro"

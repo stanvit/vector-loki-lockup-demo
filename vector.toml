@@ -1,0 +1,37 @@
+healthchecks.enabled = false
+
+[api]
+enabled = true
+address = "0.0.0.0:8686"
+
+[sources.http]
+type = "http"
+address = "0.0.0.0:8787"
+encoding = "ndjson"
+
+[transforms.json]
+type = "remap"
+inputs = [ "http" ]
+source = '''
+. = parse_json!(.message)
+'''
+
+# [sinks.debug]
+# type = "console"
+# inputs = ["json"]
+# target = "stdout"
+# encoding = "json"
+
+[sinks.loki]
+type = "loki"
+inputs = ["json"]
+endpoint = "http://loki:3100"
+
+encoding.codec = "text"
+encoding.timestamp_format = "rfc3339"
+
+labels.type = "test"
+labels.label = "{{ label }}"
+
+request.concurrency = 1
+# request.concurrency = "adaptive"
